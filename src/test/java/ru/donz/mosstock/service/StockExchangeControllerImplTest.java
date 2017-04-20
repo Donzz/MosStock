@@ -79,4 +79,13 @@ public class StockExchangeControllerImplTest
         assertEquals( "Average price must be the same", new BigDecimal( 20 ).setScale( 2, RoundingMode.HALF_UP ),
                 result.getSimpleAverageSum() );
     }
+
+    @Test
+    public void calculateNoRequests()
+    {
+        RequestPool requestPool = controller.createRequestPool();
+        AuctionResult result = controller.calculate( requestPool );
+        assertEquals( "Wrong deals amount", 0, result.getDeals().size() );
+        assertEquals( "Wrong total amount", 0, result.getTotalAmount() );
+    }
 }
