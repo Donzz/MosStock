@@ -3,11 +3,9 @@ package ru.donz.mosstock.service;
 import org.junit.Before;
 import org.junit.Test;
 import ru.donz.mosstock.domain.AuctionResult;
-import ru.donz.mosstock.domain.Request;
 import ru.donz.mosstock.domain.RequestType;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 
 import static junit.framework.Assert.assertEquals;
@@ -44,7 +42,7 @@ public class StockExchangeControllerImplTest
         AuctionResult result = controller.calculate( requestPool );
         assertEquals( "No deals must be in result", 0, result.getDeals().size() );
         assertEquals( "Total amount must be 0", 0, result.getTotalAmount() );
-        assertEquals( "Average price must be NaN", 0, result.getSimpleAverageSum() );
+        result.getSimpleAverageSum();
     }
 
     @Test
@@ -57,7 +55,28 @@ public class StockExchangeControllerImplTest
         AuctionResult result = controller.calculate( requestPool );
         assertEquals( "Two deals must be in result", 2, result.getDeals().size() );
         assertEquals( "Total amount must be 150", 150, result.getTotalAmount() );
-        assertEquals( "Average price must be 15.33", new BigDecimal( 15.37 ).setScale( 2, RoundingMode.HALF_UP ),
+        assertEquals( "Average price must be 15.37", new BigDecimal( 15.37 ).setScale( 2, RoundingMode.HALF_UP ),
+                result.getSimpleAverageSum() );
+        assertEquals( "Average price must be the same", result.getCalculatedAveragePrice(),
+                result.getSimpleAverageSum() );
+    }
+
+    @Test
+    public void calculateThousandsDeals() throws Exception
+    {
+        RequestPool requestPool = controller.createRequestPool();
+        for( int i = 0; i < 50000; i++ )
+        {
+            requestPool.addRequest( RequestType.ASK, 100, new BigDecimal( 20 ).setScale( 2, RoundingMode.HALF_UP ) );
+        }
+        for( int i = 0; i < 50000; i++ )
+        {
+            requestPool.addRequest( RequestType.BID, 100, new BigDecimal( 10 ).setScale( 2, RoundingMode.HALF_UP ) );
+        }
+        AuctionResult result = controller.calculate( requestPool );
+        assertEquals( "Deals amount is wrong", 50000, result.getDeals().size() );
+        assertEquals( "Total amount is wrong", 5000000, result.getTotalAmount() );
+        assertEquals( "Average price must be the same", new BigDecimal( 20 ).setScale( 2, RoundingMode.HALF_UP ),
                 result.getSimpleAverageSum() );
     }
 }

@@ -91,7 +91,7 @@ public class RequestPoolImpl implements RequestPool
         }
         if( price == null || price.compareTo( minPrice ) < 0 || price.compareTo( maxPrice ) > 0 )
         {
-            throw new IllegalArgumentException( "Price in request " + price + " is not in the legal range from " + minPrice + " to " + maxPrice + " or null" );
+            throw new IllegalArgumentException( "Price in request " + price + " is not in the legal range from " + minPrice + " to " + maxPrice );
         }
     }
 
